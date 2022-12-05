@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.java.api.errors;
 
+import com.google.errorprone.annotations.CompileTimeConstant;
 import com.palantir.logsafe.Arg;
 import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.SafeLoggable;
@@ -34,7 +35,7 @@ import java.util.Optional;
  */
 public abstract class QosException extends RuntimeException {
 
-    private final Optional<Reason> reason;
+    private final Optional<String> reason;
 
     // Not meant for external subclassing.
     private QosException(String message) {
@@ -42,7 +43,7 @@ public abstract class QosException extends RuntimeException {
         this.reason = Optional.empty();
     }
 
-    private QosException(String message, Optional<Reason> reason) {
+    private QosException(String message, Optional<String> reason) {
         super(message);
         this.reason = reason;
     }
@@ -52,13 +53,13 @@ public abstract class QosException extends RuntimeException {
         this.reason = Optional.empty();
     }
 
-    private QosException(String message, Throwable cause, Optional<Reason> reason) {
+    private QosException(String message, Throwable cause, Optional<String> reason) {
         super(message, cause);
         this.reason = reason;
     }
 
-    public Optional<String> getReason() {
-        return this.reason.map(Reason::toString);
+    public Optional<String> getString() {
+        return this.reason;
     }
 
     public abstract <T> T accept(Visitor<T> visitor);
@@ -134,9 +135,9 @@ public abstract class QosException extends RuntimeException {
     /** See {@link #throttle}. */
     public static final class Throttle extends QosException implements SafeLoggable {
         static class Factory {
-            private Reason reason;
+            private @CompileTimeConstant final String reason;
 
-            private Factory(Reason reason) {
+            private Factory(String reason) {
                 this.reason = reason;
             }
 
@@ -153,7 +154,7 @@ public abstract class QosException extends RuntimeException {
             }
         }
 
-        static Factory reason(Reason reason) {
+        static Factory reason(@CompileTimeConstant final String reason) {
             return new Factory(reason);
         }
 
@@ -164,7 +165,7 @@ public abstract class QosException extends RuntimeException {
             this.retryAfter = retryAfter;
         }
 
-        private Throttle(Optional<Duration> retryAfter, Optional<Reason> reason) {
+        private Throttle(Optional<Duration> retryAfter, Optional<String> reason) {
             super("Suggesting request throttling with optional retryAfter duration: " + retryAfter, reason);
             this.retryAfter = retryAfter;
         }
@@ -174,7 +175,7 @@ public abstract class QosException extends RuntimeException {
             this.retryAfter = retryAfter;
         }
 
-        private Throttle(Optional<Duration> retryAfter, Throwable cause, Optional<Reason> reason) {
+        private Throttle(Optional<Duration> retryAfter, Throwable cause, Optional<String> reason) {
             super("Suggesting request throttling with optional retryAfter duration: " + retryAfter, cause, reason);
             this.retryAfter = retryAfter;
         }
@@ -202,9 +203,9 @@ public abstract class QosException extends RuntimeException {
     /** See {@link #retryOther}. */
     public static final class RetryOther extends QosException implements SafeLoggable {
         static class Factory {
-            private Reason reason;
+            private @CompileTimeConstant final String reason;
 
-            private Factory(Reason reason) {
+            private Factory(String reason) {
                 this.reason = reason;
             }
 
@@ -217,7 +218,7 @@ public abstract class QosException extends RuntimeException {
             }
         }
 
-        static Factory reason(Reason reason) {
+        static Factory reason(@CompileTimeConstant final String reason) {
             return new Factory(reason);
         }
 
@@ -228,12 +229,17 @@ public abstract class QosException extends RuntimeException {
             this.redirectTo = redirectTo;
         }
 
-        private RetryOther(URL redirectTo, Optional<Reason> reason) {
+        private RetryOther(URL redirectTo, Optional<String> reason) {
             super("Suggesting request retry against: " + redirectTo.toString(), reason);
             this.redirectTo = redirectTo;
         }
 
-        private RetryOther(URL redirectTo, Throwable cause, Optional<Reason> reason) {
+        private RetryOther(URL redirectTo, Throwable cause) {
+            super("Suggesting request retry against: " + redirectTo.toString(), cause);
+            this.redirectTo = redirectTo;
+        }
+
+        private RetryOther(URL redirectTo, Throwable cause, Optional<String> reason) {
             super("Suggesting request retry against: " + redirectTo.toString(), cause, reason);
             this.redirectTo = redirectTo;
         }
@@ -262,9 +268,9 @@ public abstract class QosException extends RuntimeException {
     /** See {@link #unavailable}. */
     public static final class Unavailable extends QosException implements SafeLoggable {
         static class Factory {
-            private Reason reason;
+            private @CompileTimeConstant final String reason;
 
-            private Factory(Reason reason) {
+            private Factory(String reason) {
                 this.reason = reason;
             }
 
@@ -277,7 +283,7 @@ public abstract class QosException extends RuntimeException {
             }
         }
 
-        static Factory reason(Reason reason) {
+        static Factory reason(@CompileTimeConstant final String reason) {
             return new Factory(reason);
         }
 
@@ -287,7 +293,7 @@ public abstract class QosException extends RuntimeException {
             super(SERVER_UNAVAILABLE);
         }
 
-        private Unavailable(Optional<Reason> reason) {
+        private Unavailable(Optional<String> reason) {
             super(SERVER_UNAVAILABLE, reason);
         }
 
@@ -295,7 +301,7 @@ public abstract class QosException extends RuntimeException {
             super(SERVER_UNAVAILABLE, cause);
         }
 
-        private Unavailable(Throwable cause, Optional<Reason> reason) {
+        private Unavailable(Throwable cause, Optional<String> reason) {
             super(SERVER_UNAVAILABLE, cause, reason);
         }
 

@@ -48,36 +48,13 @@ public final class QosExceptionTest {
         assertThat(QosException.unavailable().accept(visitor)).isEqualTo(QosException.Unavailable.class);
     }
 
-    enum MyQoSReason implements Reason {
-        REASON_1 {
-            @Override
-            public String toString() {
-                return "my-reason-1";
-            }
-        },
-        REASON_2 {
-            @Override
-            public String toString() {
-                return "my-reason-2";
-            }
-        },
-        REASON_3 {
-            @Override
-            public String toString() {
-                return "my-reason-3";
-            }
-        },
-    }
-
     @Test
     public void testQosExceptionWithReason() {
-        QosException.Throttle.Factory throttleWithReasonFactory = QosException.Throttle.reason(MyQoSReason.REASON_1);
+        QosException.Throttle.Factory throttleWithReasonFactory = QosException.Throttle.reason("my-reason-1");
         // throw throttleWithReasonFactory.throttle();
-        QosException.RetryOther.Factory retryOtherWithReasonFactory =
-                QosException.RetryOther.reason(MyQoSReason.REASON_2);
+        QosException.RetryOther.Factory retryOtherWithReasonFactory = QosException.RetryOther.reason("my-reason-2");
         // throw retryOtherWithReasonFactory.retryOther(new URL(...));
-        QosException.Unavailable.Factory unavailableWithReasonFactory =
-                QosException.Unavailable.reason(MyQoSReason.REASON_3);
+        QosException.Unavailable.Factory unavailableWithReasonFactory = QosException.Unavailable.reason("my-reason-3");
         // throw unavailableWithReasonFactory.unavailable();
     }
 }
