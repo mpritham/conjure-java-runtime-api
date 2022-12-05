@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.java.api.errors;
 
+import com.google.errorprone.annotations.CompileTimeConstant;
 import com.palantir.logsafe.Arg;
 import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.SafeLoggable;
@@ -33,14 +34,57 @@ import java.util.Optional;
  * e.g., HTTP status codes 429, 503, etc. in the case of HTTP transport.
  */
 public abstract class QosException extends RuntimeException {
+    //    static class Factory {
+    //        private @CompileTimeConstant final String reason;
+    //
+    //        // Consider changing the name of "reason". Should we allow passing in arbitrary strings?
+    //        private Factory(@CompileTimeConstant final String reason) {
+    //            this.reason = reason;
+    //        }
+    //
+    //        public Throttle throttle(Throwable cause) {
+    //            // Should we implement all 3? or have separate factories for each?
+    //            // Check how the methods are used in production currently.
+    //            // We further force low cardinality of "reasons"
+    //            // Should we force them to be an enum?
+    //            // e.g.: type Reason = {msg: String;}
+    //            return new Throttle(Optional.empty(), cause, Optional.of(this.reason));
+    //        }
+    //
+    //        public Throttle throttle() {
+    //            return new Throttle(Optional.empty());
+    //        }
+    //    }
+    //
+    //    static Factory reason(String reason) {
+    //        return new Factory(reason);
+    //    }
+
+    private final Optional<String> reason;
 
     // Not meant for external subclassing.
     private QosException(String message) {
         super(message);
+        this.reason = Optional.empty();
+    }
+
+    private QosException(String message, Optional<String> reason) {
+        super(message);
+        this.reason = reason;
     }
 
     private QosException(String message, Throwable cause) {
         super(message, cause);
+        this.reason = Optional.empty();
+    }
+
+    private QosException(String message, Throwable cause, Optional<String> reason) {
+        super(message, cause);
+        this.reason = reason;
+    }
+
+    public Optional<String> getReason() {
+        return reason;
     }
 
     public abstract <T> T accept(Visitor<T> visitor);
@@ -115,6 +159,31 @@ public abstract class QosException extends RuntimeException {
 
     /** See {@link #throttle}. */
     public static final class Throttle extends QosException implements SafeLoggable {
+
+        static class Factory {
+            private @CompileTimeConstant final String reason;
+
+            private Factory(@CompileTimeConstant final String reason) {
+                this.reason = reason;
+            }
+
+            public Throttle throttle() {
+                return new Throttle(Optional.empty(), Optional.of(this.reason));
+            }
+
+            public Throttle throttle(Optional<Duration> retryAfter) {
+                return new Throttle(retryAfter, Optional.of(this.reason));
+            }
+
+            public Throttle throttle(Optional<Duration> retryAfter, Throwable cause) {
+                return new Throttle(retryAfter, cause, Optional.of(this.reason));
+            }
+        }
+
+        static Factory reason(@CompileTimeConstant final String reason) {
+            return new Factory(reason);
+        }
+
         private final Optional<Duration> retryAfter;
 
         private Throttle(Optional<Duration> retryAfter) {
@@ -122,8 +191,18 @@ public abstract class QosException extends RuntimeException {
             this.retryAfter = retryAfter;
         }
 
+        private Throttle(Optional<Duration> retryAfter, Optional<String> reason) {
+            super("Suggesting request throttling with optional retryAfter duration: " + retryAfter, reason);
+            this.retryAfter = retryAfter;
+        }
+
         private Throttle(Optional<Duration> retryAfter, Throwable cause) {
             super("Suggesting request throttling with optional retryAfter duration: " + retryAfter, cause);
+            this.retryAfter = retryAfter;
+        }
+
+        private Throttle(Optional<Duration> retryAfter, Throwable cause, Optional<String> reason) {
+            super("Suggesting request throttling with optional retryAfter duration: " + retryAfter, cause, reason);
             this.retryAfter = retryAfter;
         }
 

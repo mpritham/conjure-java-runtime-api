@@ -47,4 +47,10 @@ public final class QosExceptionTest {
                 .isEqualTo(QosException.RetryOther.class);
         assertThat(QosException.unavailable().accept(visitor)).isEqualTo(QosException.Unavailable.class);
     }
+
+    @Test
+    public void testPritham() {
+        QosException.Throttle.Factory throttleFactory = QosException.Throttle.reason("reason");
+        throw throttleFactory.throttle();
+    }
 }
