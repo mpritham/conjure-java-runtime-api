@@ -48,9 +48,26 @@ public final class QosExceptionTest {
         assertThat(QosException.unavailable().accept(visitor)).isEqualTo(QosException.Unavailable.class);
     }
 
+    enum MyReason implements Reason {
+        REASON1 {
+            @Override
+            public String toString() {
+                return "my reason 1";
+            }
+        },
+        REASON2 {
+            @Override
+            public String toString() {
+                return "my reason 2";
+            }
+        };
+    }
+
     @Test
     public void testPritham() {
+
         QosException.Throttle.Factory throttleFactory = QosException.Throttle.reason("reason");
+        QosException.Throttle.Factory throttleFactory2 = QosException.Throttle.reason(MyReason.REASON1);
         throw throttleFactory.throttle();
     }
 }

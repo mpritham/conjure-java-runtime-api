@@ -34,31 +34,6 @@ import java.util.Optional;
  * e.g., HTTP status codes 429, 503, etc. in the case of HTTP transport.
  */
 public abstract class QosException extends RuntimeException {
-    //    static class Factory {
-    //        private @CompileTimeConstant final String reason;
-    //
-    //        // Consider changing the name of "reason". Should we allow passing in arbitrary strings?
-    //        private Factory(@CompileTimeConstant final String reason) {
-    //            this.reason = reason;
-    //        }
-    //
-    //        public Throttle throttle(Throwable cause) {
-    //            // Should we implement all 3? or have separate factories for each?
-    //            // Check how the methods are used in production currently.
-    //            // We further force low cardinality of "reasons"
-    //            // Should we force them to be an enum?
-    //            // e.g.: type Reason = {msg: String;}
-    //            return new Throttle(Optional.empty(), cause, Optional.of(this.reason));
-    //        }
-    //
-    //        public Throttle throttle() {
-    //            return new Throttle(Optional.empty());
-    //        }
-    //    }
-    //
-    //    static Factory reason(String reason) {
-    //        return new Factory(reason);
-    //    }
 
     private final Optional<String> reason;
 
@@ -161,26 +136,37 @@ public abstract class QosException extends RuntimeException {
     public static final class Throttle extends QosException implements SafeLoggable {
 
         static class Factory {
-            private @CompileTimeConstant final String reason;
+            private @CompileTimeConstant final String reasonAsCompileTimeString;
+            private Reason reasonAsOwnInterface;
 
-            private Factory(@CompileTimeConstant final String reason) {
-                this.reason = reason;
+            private Factory(@CompileTimeConstant final String reasonAsCompileTimeString) {
+                this.reasonAsCompileTimeString = reasonAsCompileTimeString;
+            }
+
+            private Factory(Reason reasonAsOwnInterface) {
+                this.reasonAsOwnInterface = reasonAsOwnInterface;
             }
 
             public Throttle throttle() {
-                return new Throttle(Optional.empty(), Optional.of(this.reason));
+                Object interfaceReason =
+                        new Throttle(Optional.empty(), Optional.of(this.reasonAsOwnInterface.toString()));
+                return new Throttle(Optional.empty(), Optional.of(this.reasonAsCompileTimeString));
             }
 
             public Throttle throttle(Optional<Duration> retryAfter) {
-                return new Throttle(retryAfter, Optional.of(this.reason));
+                return new Throttle(retryAfter, Optional.of(this.reasonAsCompileTimeString));
             }
 
             public Throttle throttle(Optional<Duration> retryAfter, Throwable cause) {
-                return new Throttle(retryAfter, cause, Optional.of(this.reason));
+                return new Throttle(retryAfter, cause, Optional.of(this.reasonAsCompileTimeString));
             }
         }
 
         static Factory reason(@CompileTimeConstant final String reason) {
+            return new Factory(reason);
+        }
+
+        static Factory reason(Reason reason) {
             return new Factory(reason);
         }
 
