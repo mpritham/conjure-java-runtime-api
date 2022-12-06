@@ -51,7 +51,7 @@ public final class QosExceptionTest {
 
     @Test
     public void testReason() {
-        QoSExceptionReason reason = new QoSExceptionReason("reason");
+        QoSReason reason = new QoSReason("reason");
         try {
             throw QosException.throttle(reason);
         } catch (QosException.Throttle e) {
@@ -65,7 +65,7 @@ public final class QosExceptionTest {
         try {
             throw QosException.throttle();
         } catch (QosException.Throttle e) {
-            assertThat(e.getReason().getName()).isEqualTo(QoSExceptionReason.DEFAULT_THROTTLE_REASON);
+            assertThat(e.getReason().getName()).isEqualTo(QoSReason.DEFAULT_THROTTLE_REASON);
         } catch (Exception e) {
             failBecauseExceptionWasNotThrown(QosException.Throttle.class);
         }
@@ -73,7 +73,7 @@ public final class QosExceptionTest {
         try {
             throw QosException.retryOther(new URL("http://foo"));
         } catch (QosException.RetryOther e) {
-            assertThat(e.getReason().getName()).isEqualTo(QoSExceptionReason.DEFAULT_RETRY_OTHER_REASON);
+            assertThat(e.getReason().getName()).isEqualTo(QoSReason.DEFAULT_RETRY_OTHER_REASON);
         } catch (Exception e) {
             failBecauseExceptionWasNotThrown(QosException.RetryOther.class);
         }
@@ -81,7 +81,7 @@ public final class QosExceptionTest {
         try {
             throw QosException.unavailable();
         } catch (QosException.Unavailable e) {
-            assertThat(e.getReason().getName()).isEqualTo(QoSExceptionReason.DEFAULT_UNAVAILABLE_REASON);
+            assertThat(e.getReason().getName()).isEqualTo(QoSReason.DEFAULT_UNAVAILABLE_REASON);
         } catch (Exception e) {
             failBecauseExceptionWasNotThrown(QosException.Unavailable.class);
         }
