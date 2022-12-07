@@ -70,7 +70,7 @@ public abstract class QosException extends RuntimeException {
     }
 
     /**
-     * Returns stuff.
+     * Like {@link #throttle()}, but includes a reason.
      */
     public static Throttle throttle(QosReason reason) {
         return new Throttle(Optional.empty(), reason);
@@ -83,6 +83,9 @@ public abstract class QosException extends RuntimeException {
         return new Throttle(Optional.empty(), cause);
     }
 
+    /**
+     * Like {@link #throttle()}, but includes a reason, and a cause.
+     */
     public static Throttle throttle(QosReason reason, Throwable cause) {
         return new Throttle(Optional.empty(), cause, reason);
     }
