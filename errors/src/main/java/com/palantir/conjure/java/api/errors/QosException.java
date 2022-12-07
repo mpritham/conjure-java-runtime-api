@@ -95,6 +95,9 @@ public abstract class QosException extends RuntimeException {
         return new Throttle(Optional.of(duration));
     }
 
+    /**
+     * Like {@link #throttle(Duration)}, but includes a reason.
+     */
     public static Throttle throttle(QosReason reason, Duration duration) {
         return new Throttle(Optional.of(duration), reason);
     }
@@ -106,6 +109,9 @@ public abstract class QosException extends RuntimeException {
         return new Throttle(Optional.of(duration), cause);
     }
 
+    /**
+     * Like {@link #throttle(Duration)}, but includes a reason, and a cause.
+     */
     public static Throttle throttle(QosReason reason, Duration duration, Throwable cause) {
         return new Throttle(Optional.of(duration), cause, reason);
     }
@@ -118,6 +124,9 @@ public abstract class QosException extends RuntimeException {
         return new RetryOther(redirectTo);
     }
 
+    /**
+     * Like {@link #retryOther(URL)}, but includes a reason.
+     */
     public static RetryOther retryOther(QosReason reason, URL redirectTo) {
         return new RetryOther(redirectTo, reason);
     }
@@ -129,6 +138,9 @@ public abstract class QosException extends RuntimeException {
         return new RetryOther(redirectTo, cause);
     }
 
+    /**
+     * Like {@link #retryOther(URL)}, but includes a reason, and a cause.
+     */
     public static RetryOther retryOther(QosReason reason, URL redirectTo, Throwable cause) {
         return new RetryOther(redirectTo, cause, reason);
     }
@@ -141,6 +153,9 @@ public abstract class QosException extends RuntimeException {
         return new Unavailable();
     }
 
+    /**
+     * Like {@link #unavailable()}, but includes a reason.
+     */
     public static Unavailable unavailable(QosReason reason) {
         return new Unavailable(reason);
     }
@@ -152,6 +167,9 @@ public abstract class QosException extends RuntimeException {
         return new Unavailable(cause);
     }
 
+    /**
+     * Like {@link #unavailable()}, but includes a reason, and a cause.
+     */
     public static Unavailable unavailable(QosReason reason, Throwable cause) {
         return new Unavailable(cause, reason);
     }
