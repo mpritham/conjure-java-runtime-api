@@ -158,13 +158,11 @@ public abstract class QosException extends RuntimeException {
 
     /** See {@link #throttle}. */
     public static final class Throttle extends QosException implements SafeLoggable {
-        public static final String DEFAULT_REASON = "qos-throttle";
+        private static final QosReason DEFAULT_REASON = QosReason.of("qos-throttle");
         private final Optional<Duration> retryAfter;
 
         private Throttle(Optional<Duration> retryAfter) {
-            super(
-                    "Suggesting request throttling with optional retryAfter duration: " + retryAfter,
-                    QosReason.of(DEFAULT_REASON));
+            super("Suggesting request throttling with optional retryAfter duration: " + retryAfter, DEFAULT_REASON);
             this.retryAfter = retryAfter;
         }
 
@@ -177,7 +175,7 @@ public abstract class QosException extends RuntimeException {
             super(
                     "Suggesting request throttling with optional retryAfter duration: " + retryAfter,
                     cause,
-                    QosReason.of(DEFAULT_REASON));
+                    DEFAULT_REASON);
             this.retryAfter = retryAfter;
         }
 
@@ -208,11 +206,11 @@ public abstract class QosException extends RuntimeException {
 
     /** See {@link #retryOther}. */
     public static final class RetryOther extends QosException implements SafeLoggable {
-        public static final String DEFAULT_REASON = "qos-retry-other";
+        private static final QosReason DEFAULT_REASON = QosReason.of("qos-retry-other");
         private final URL redirectTo;
 
         private RetryOther(URL redirectTo) {
-            super("Suggesting request retry against: " + redirectTo.toString(), QosReason.of(DEFAULT_REASON));
+            super("Suggesting request retry against: " + redirectTo.toString(), DEFAULT_REASON);
             this.redirectTo = redirectTo;
         }
 
@@ -222,7 +220,7 @@ public abstract class QosException extends RuntimeException {
         }
 
         private RetryOther(URL redirectTo, Throwable cause) {
-            super("Suggesting request retry against: " + redirectTo.toString(), cause, QosReason.of(DEFAULT_REASON));
+            super("Suggesting request retry against: " + redirectTo.toString(), cause, DEFAULT_REASON);
             this.redirectTo = redirectTo;
         }
 
@@ -254,12 +252,12 @@ public abstract class QosException extends RuntimeException {
 
     /** See {@link #unavailable}. */
     public static final class Unavailable extends QosException implements SafeLoggable {
-        public static final String DEFAULT_REASON = "qos-unavailable";
+        private static final QosReason DEFAULT_REASON = QosReason.of("qos-unavailable");
 
         private static final String SERVER_UNAVAILABLE = "Server unavailable";
 
         private Unavailable() {
-            super(SERVER_UNAVAILABLE, QosReason.of(DEFAULT_REASON));
+            super(SERVER_UNAVAILABLE, DEFAULT_REASON);
         }
 
         private Unavailable(QosReason reason) {
@@ -267,7 +265,7 @@ public abstract class QosException extends RuntimeException {
         }
 
         private Unavailable(Throwable cause) {
-            super(SERVER_UNAVAILABLE, cause, QosReason.of(DEFAULT_REASON));
+            super(SERVER_UNAVAILABLE, cause, DEFAULT_REASON);
         }
 
         private Unavailable(Throwable cause, QosReason reason) {
