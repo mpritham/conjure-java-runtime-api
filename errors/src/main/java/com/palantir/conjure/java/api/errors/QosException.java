@@ -83,7 +83,7 @@ public abstract class QosException extends RuntimeException {
         return new Throttle(Optional.empty(), cause);
     }
 
-    public static Throttle throttle(Throwable cause, QosReason reason) {
+    public static Throttle throttle(QosReason reason, Throwable cause) {
         return new Throttle(Optional.empty(), cause, reason);
     }
 
@@ -95,7 +95,7 @@ public abstract class QosException extends RuntimeException {
         return new Throttle(Optional.of(duration));
     }
 
-    public static Throttle throttle(Duration duration, QosReason reason) {
+    public static Throttle throttle(QosReason reason, Duration duration) {
         return new Throttle(Optional.of(duration), reason);
     }
 
@@ -106,7 +106,7 @@ public abstract class QosException extends RuntimeException {
         return new Throttle(Optional.of(duration), cause);
     }
 
-    public static Throttle throttle(Duration duration, Throwable cause, QosReason reason) {
+    public static Throttle throttle(QosReason reason, Duration duration, Throwable cause) {
         return new Throttle(Optional.of(duration), cause, reason);
     }
 
@@ -118,7 +118,7 @@ public abstract class QosException extends RuntimeException {
         return new RetryOther(redirectTo);
     }
 
-    public static RetryOther retryOther(URL redirectTo, QosReason reason) {
+    public static RetryOther retryOther(QosReason reason, URL redirectTo) {
         return new RetryOther(redirectTo, reason);
     }
 
@@ -129,7 +129,7 @@ public abstract class QosException extends RuntimeException {
         return new RetryOther(redirectTo, cause);
     }
 
-    public static RetryOther retryOther(URL redirectTo, Throwable cause, QosReason reason) {
+    public static RetryOther retryOther(QosReason reason, URL redirectTo, Throwable cause) {
         return new RetryOther(redirectTo, cause, reason);
     }
 
@@ -152,7 +152,7 @@ public abstract class QosException extends RuntimeException {
         return new Unavailable(cause);
     }
 
-    public static Unavailable unavailable(Throwable cause, QosReason reason) {
+    public static Unavailable unavailable(QosReason reason, Throwable cause) {
         return new Unavailable(cause, reason);
     }
 
