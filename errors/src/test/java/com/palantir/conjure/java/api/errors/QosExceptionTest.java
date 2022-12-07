@@ -17,8 +17,11 @@
 package com.palantir.conjure.java.api.errors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
+import com.palantir.conjure.java.api.errors.QosException.RetryOther;
+import com.palantir.conjure.java.api.errors.QosException.Throttle;
+import com.palantir.conjure.java.api.errors.QosException.Unavailable;
 import java.net.URL;
 import org.junit.jupiter.api.Test;
 
@@ -51,39 +54,17 @@ public final class QosExceptionTest {
 
     @Test
     public void testReason() {
-        QosReason reason = new QosReason("reason");
-        try {
-            throw QosException.throttle(reason);
-        } catch (QosException.Throttle e) {
-            assertThat(e.getReason().getName()).isEqualTo(reason.getName());
-        }
+        QosReason reason = QosReason.of("reason");
+        assertThat(QosException.throttle(reason).getReason()).isEqualTo(reason);
     }
 
     @Test
     public void testDefaultReasons() {
-
-        try {
-            throw QosException.throttle();
-        } catch (QosException.Throttle e) {
-            assertThat(e.getReason().getName()).isEqualTo(QosReason.DEFAULT_THROTTLE_REASON);
-        } catch (Exception e) {
-            failBecauseExceptionWasNotThrown(QosException.Throttle.class);
-        }
-
-        try {
-            throw QosException.retryOther(new URL("http://foo"));
-        } catch (QosException.RetryOther e) {
-            assertThat(e.getReason().getName()).isEqualTo(QosReason.DEFAULT_RETRY_OTHER_REASON);
-        } catch (Exception e) {
-            failBecauseExceptionWasNotThrown(QosException.RetryOther.class);
-        }
-
-        try {
-            throw QosException.unavailable();
-        } catch (QosException.Unavailable e) {
-            assertThat(e.getReason().getName()).isEqualTo(QosReason.DEFAULT_UNAVAILABLE_REASON);
-        } catch (Exception e) {
-            failBecauseExceptionWasNotThrown(QosException.Unavailable.class);
-        }
+        assertThat(QosException.throttle().getReason().toString()).isEqualTo(Throttle.DEFAULT_REASON);
+        assertThatNoException().isThrownBy(() -> assertThat(QosException.retryOther(new URL("http://foo"))
+                        .getReason()
+                        .toString())
+                .isEqualTo(RetryOther.DEFAULT_REASON));
+        assertThat(QosException.unavailable().getReason().toString()).isEqualTo(Unavailable.DEFAULT_REASON);
     }
 }

@@ -17,19 +17,40 @@
 package com.palantir.conjure.java.api.errors;
 
 import com.google.errorprone.annotations.CompileTimeConstant;
+import java.util.Objects;
 
 public final class QosReason {
-    public static final String DEFAULT_THROTTLE_REASON = "qos-throttle";
-    public static final String DEFAULT_RETRY_OTHER_REASON = "qos-retry-other";
-    public static final String DEFAULT_UNAVAILABLE_REASON = "qos-unavailable";
 
-    private @CompileTimeConstant final String name;
+    @CompileTimeConstant
+    private final String name;
 
-    QosReason(@CompileTimeConstant final String name) {
+    private QosReason(@CompileTimeConstant String name) {
         this.name = name;
     }
 
-    String getName() {
-        return this.name;
+    public static QosReason of(@CompileTimeConstant String name) {
+        return new QosReason(name);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        } else if (!(other instanceof QosReason)) {
+            return false;
+        } else {
+            QosReason otherReason = (QosReason) other;
+            return Objects.equals(this.name, otherReason.name);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.name);
     }
 }
