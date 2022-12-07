@@ -34,20 +34,20 @@ import java.util.Optional;
  */
 public abstract class QosException extends RuntimeException {
 
-    private final QoSReason reason;
+    private final QosReason reason;
 
     // Not meant for external subclassing.
-    private QosException(String message, QoSReason reason) {
+    private QosException(String message, QosReason reason) {
         super(message);
         this.reason = reason;
     }
 
-    private QosException(String message, Throwable cause, QoSReason reason) {
+    private QosException(String message, Throwable cause, QosReason reason) {
         super(message, cause);
         this.reason = reason;
     }
 
-    public QoSReason getReason() {
+    public QosReason getReason() {
         return reason;
     }
 
@@ -72,7 +72,7 @@ public abstract class QosException extends RuntimeException {
     /**
      * Returns stuff.
      */
-    public static Throttle throttle(QoSReason reason) {
+    public static Throttle throttle(QosReason reason) {
         return new Throttle(Optional.empty(), reason);
     }
 
@@ -83,7 +83,7 @@ public abstract class QosException extends RuntimeException {
         return new Throttle(Optional.empty(), cause);
     }
 
-    public static Throttle throttle(Throwable cause, QoSReason reason) {
+    public static Throttle throttle(Throwable cause, QosReason reason) {
         return new Throttle(Optional.empty(), cause, reason);
     }
 
@@ -95,7 +95,7 @@ public abstract class QosException extends RuntimeException {
         return new Throttle(Optional.of(duration));
     }
 
-    public static Throttle throttle(Duration duration, QoSReason reason) {
+    public static Throttle throttle(Duration duration, QosReason reason) {
         return new Throttle(Optional.of(duration), reason);
     }
 
@@ -106,7 +106,7 @@ public abstract class QosException extends RuntimeException {
         return new Throttle(Optional.of(duration), cause);
     }
 
-    public static Throttle throttle(Duration duration, Throwable cause, QoSReason reason) {
+    public static Throttle throttle(Duration duration, Throwable cause, QosReason reason) {
         return new Throttle(Optional.of(duration), cause, reason);
     }
 
@@ -118,7 +118,7 @@ public abstract class QosException extends RuntimeException {
         return new RetryOther(redirectTo);
     }
 
-    public static RetryOther retryOther(URL redirectTo, QoSReason reason) {
+    public static RetryOther retryOther(URL redirectTo, QosReason reason) {
         return new RetryOther(redirectTo, reason);
     }
 
@@ -129,7 +129,7 @@ public abstract class QosException extends RuntimeException {
         return new RetryOther(redirectTo, cause);
     }
 
-    public static RetryOther retryOther(URL redirectTo, Throwable cause, QoSReason reason) {
+    public static RetryOther retryOther(URL redirectTo, Throwable cause, QosReason reason) {
         return new RetryOther(redirectTo, cause, reason);
     }
 
@@ -141,7 +141,7 @@ public abstract class QosException extends RuntimeException {
         return new Unavailable();
     }
 
-    public static Unavailable unavailable(QoSReason reason) {
+    public static Unavailable unavailable(QosReason reason) {
         return new Unavailable(reason);
     }
 
@@ -152,7 +152,7 @@ public abstract class QosException extends RuntimeException {
         return new Unavailable(cause);
     }
 
-    public static Unavailable unavailable(Throwable cause, QoSReason reason) {
+    public static Unavailable unavailable(Throwable cause, QosReason reason) {
         return new Unavailable(cause, reason);
     }
 
@@ -164,11 +164,11 @@ public abstract class QosException extends RuntimeException {
         private Throttle(Optional<Duration> retryAfter) {
             super(
                     "Suggesting request throttling with optional retryAfter duration: " + retryAfter,
-                    new QoSReason(QoSReason.DEFAULT_THROTTLE_REASON));
+                    new QosReason(QosReason.DEFAULT_THROTTLE_REASON));
             this.retryAfter = retryAfter;
         }
 
-        private Throttle(Optional<Duration> retryAfter, QoSReason reason) {
+        private Throttle(Optional<Duration> retryAfter, QosReason reason) {
             super("Suggesting request throttling with optional retryAfter duration: " + retryAfter, reason);
             this.retryAfter = retryAfter;
         }
@@ -177,11 +177,11 @@ public abstract class QosException extends RuntimeException {
             super(
                     "Suggesting request throttling with optional retryAfter duration: " + retryAfter,
                     cause,
-                    new QoSReason(QoSReason.DEFAULT_THROTTLE_REASON));
+                    new QosReason(QosReason.DEFAULT_THROTTLE_REASON));
             this.retryAfter = retryAfter;
         }
 
-        private Throttle(Optional<Duration> retryAfter, Throwable cause, QoSReason reason) {
+        private Throttle(Optional<Duration> retryAfter, Throwable cause, QosReason reason) {
             super("Suggesting request throttling with optional retryAfter duration: " + retryAfter, cause, reason);
             this.retryAfter = retryAfter;
         }
@@ -213,11 +213,11 @@ public abstract class QosException extends RuntimeException {
         private RetryOther(URL redirectTo) {
             super(
                     "Suggesting request retry against: " + redirectTo.toString(),
-                    new QoSReason(QoSReason.DEFAULT_RETRY_OTHER_REASON));
+                    new QosReason(QosReason.DEFAULT_RETRY_OTHER_REASON));
             this.redirectTo = redirectTo;
         }
 
-        private RetryOther(URL redirectTo, QoSReason reason) {
+        private RetryOther(URL redirectTo, QosReason reason) {
             super("Suggesting request retry against: " + redirectTo.toString(), reason);
             this.redirectTo = redirectTo;
         }
@@ -226,11 +226,11 @@ public abstract class QosException extends RuntimeException {
             super(
                     "Suggesting request retry against: " + redirectTo.toString(),
                     cause,
-                    new QoSReason(QoSReason.DEFAULT_RETRY_OTHER_REASON));
+                    new QosReason(QosReason.DEFAULT_RETRY_OTHER_REASON));
             this.redirectTo = redirectTo;
         }
 
-        private RetryOther(URL redirectTo, Throwable cause, QoSReason reason) {
+        private RetryOther(URL redirectTo, Throwable cause, QosReason reason) {
             super("Suggesting request retry against: " + redirectTo.toString(), cause, reason);
             this.redirectTo = redirectTo;
         }
@@ -262,18 +262,18 @@ public abstract class QosException extends RuntimeException {
         private static final String SERVER_UNAVAILABLE = "Server unavailable";
 
         private Unavailable() {
-            super(SERVER_UNAVAILABLE, new QoSReason(QoSReason.DEFAULT_UNAVAILABLE_REASON));
+            super(SERVER_UNAVAILABLE, new QosReason(QosReason.DEFAULT_UNAVAILABLE_REASON));
         }
 
-        private Unavailable(QoSReason reason) {
+        private Unavailable(QosReason reason) {
             super(SERVER_UNAVAILABLE, reason);
         }
 
         private Unavailable(Throwable cause) {
-            super(SERVER_UNAVAILABLE, cause, new QoSReason(QoSReason.DEFAULT_UNAVAILABLE_REASON));
+            super(SERVER_UNAVAILABLE, cause, new QosReason(QosReason.DEFAULT_UNAVAILABLE_REASON));
         }
 
-        private Unavailable(Throwable cause, QoSReason reason) {
+        private Unavailable(Throwable cause, QosReason reason) {
             super(SERVER_UNAVAILABLE, cause, reason);
         }
 

@@ -18,14 +18,14 @@ package com.palantir.conjure.java.api.errors;
 
 import com.google.errorprone.annotations.CompileTimeConstant;
 
-public final class QoSReason {
+public final class QosReason {
     public static final String DEFAULT_THROTTLE_REASON = "qos-throttle";
     public static final String DEFAULT_RETRY_OTHER_REASON = "qos-retry-other";
     public static final String DEFAULT_UNAVAILABLE_REASON = "qos-unavailable";
 
     private @CompileTimeConstant final String name;
 
-    QoSReason(@CompileTimeConstant final String name) {
+    QosReason(@CompileTimeConstant final String name) {
         this.name = name;
     }
 
